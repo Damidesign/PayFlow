@@ -196,9 +196,10 @@ export async function getMerchantSubscribers(_merchant: string): Promise<Merchan
 export async function getBalance(publicKey: string): Promise<string> {
   try {
     const resp = await fetch(`https://horizon-testnet.stellar.org/accounts/${publicKey}`);
+    if (!resp.ok) throw new Error(`Horizon API error: ${resp.status}`);
     const data = await resp.json();
-    const nativeBalance = data.balances?.find((b: { asset_type: string }) => b.asset_type === "native");
-    return nativeBalance ? nativeBalance.balance : "0";
+    const nativeBalance = data.balances?.find((b: { asset_type: string; balance: string }) => b.asset_type === "native");
+    return nativeBalance?.balance ?? "0";
   } catch {
     return "0";
   }
