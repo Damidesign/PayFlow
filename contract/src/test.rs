@@ -630,6 +630,24 @@ fn test_daily_limit_blocks_cumulative_overspend() {
     client.pay_per_use(&user, &3_0000000); // 6 total > 5 limit
 }
 
+#[test]
+fn test_daily_limit_visibility_and_spend_tracking() {
+    let (env, contract_id, token_addr, user, merchant) = setup();
+    let client = FlowPayClient::new(&env, &contract_id);
+
+    client.subscribe(&user, &merchant, &1_0000000, &86400, &token_addr, &None, &None);
+
+    assert_eq!(client.get_daily_limit(&user), None);
+    assert_eq!(client.get_daily_spent(&user), 0);
+
+    client.set_daily_limit(&user, &4_0000000);
+    assert_eq!(client.get_daily_limit(&user), Some(4_0000000));
+
+    client.pay_per_use(&user, &1_0000000);
+    assert_eq!(client.get_daily_spent(&user), 1_0000000);
+    assert_eq!(client.get_daily_limit(&user), Some(4_0000000));
+}
+
 // ─────────────────────────────────────────────
 // Issue #96: referral tracking tests
 // ─────────────────────────────────────────────

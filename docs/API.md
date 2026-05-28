@@ -593,6 +593,70 @@ soroban contract invoke \
 
 ---
 
+### `get_daily_limit`
+
+Returns the current daily spending limit for the calling user, or `None` if no limit is set.
+
+```
+get_daily_limit(env: Env, user: Address) -> Option<i128>
+```
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `user` | `Address` | The subscriber address to query. |
+
+**Auth:** None.
+
+**Returns:** `Option<i128>` — current daily limit in stroops, or `None` if unset.
+
+**Storage read:** `DataKey::DailyLimit(user)` in temporary storage.
+
+**CLI example**
+
+```bash
+soroban contract invoke \
+  --id <CONTRACT_ID> \
+  --network testnet \
+  -- get_daily_limit \
+  --user <USER_ADDRESS>
+```
+
+---
+
+### `get_daily_spent`
+
+Returns the amount spent today by the calling user via `pay_per_use()`.
+
+```
+get_daily_spent(env: Env, user: Address) -> i128
+```
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `user` | `Address` | The subscriber address to query. |
+
+**Auth:** None.
+
+**Returns:** `i128` — amount spent today in stroops. Returns `0` if no spend is recorded.
+
+**Storage read:** `DataKey::DailySpent(user)` in temporary storage.
+
+**CLI example**
+
+```bash
+soroban contract invoke \
+  --id <CONTRACT_ID> \
+  --network testnet \
+  -- get_daily_spent \
+  --user <USER_ADDRESS>
+```
+
+---
+
 ## Units & Conversions
 
 All amounts are in **stroops** — the smallest unit of a Stellar token.

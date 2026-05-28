@@ -106,6 +106,55 @@ export async function buildPayPerUseTx(user: string, amount: bigint): Promise<st
   ]);
 }
 
+export async function buildSetDailyLimitTx(user: string, amount: bigint): Promise<string> {
+  return buildTx(user, "set_daily_limit", [
+    addressVal(user),
+    nativeToScVal(amount, { type: "i128" }),
+  ]);
+}
+
+export async function getDailyLimit(user: string): Promise<bigint | null> {
+  const contract = new Contract(CONTRACT_ID);
+  const account = await server.getAccount(user);
+
+  const tx = new TransactionBuilder(account, {
+    fee: BASE_FEE,
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+    .addOperation(contract.call("get_daily_limit", addressVal(user)))
+    .setTimeout(30)
+    .build();
+
+  const result = await server.simulateTransaction(tx);
+  if ("error" in result) throw new Error((result as any).error);
+
+  const retval = (result as { result?: { retval?: xdr.ScVal } }).result?.retval;
+  if (!retval || retval.switch().name === "scvVoid") return null;
+
+  return BigInt(retval.i128().toString());
+}
+
+export async function getDailySpent(user: string): Promise<bigint> {
+  const contract = new Contract(CONTRACT_ID);
+  const account = await server.getAccount(user);
+
+  const tx = new TransactionBuilder(account, {
+    fee: BASE_FEE,
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+    .addOperation(contract.call("get_daily_spent", addressVal(user)))
+    .setTimeout(30)
+    .build();
+
+  const result = await server.simulateTransaction(tx);
+  if ("error" in result) throw new Error((result as any).error);
+
+  const retval = (result as { result?: { retval?: xdr.ScVal } }).result?.retval;
+  if (!retval || retval.switch().name === "scvVoid") return 0n;
+
+  return BigInt(retval.i128().toString());
+}
+
 export async function buildApproveTx(user: string, tokenId: string, spender: string, amount: bigint): Promise<string> {
   const tokenContract = new Contract(tokenId);
   const account = await server.getAccount(user);

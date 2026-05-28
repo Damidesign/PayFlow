@@ -393,7 +393,17 @@ impl FlowPay {
         spending_limit::set_daily_limit(&env, &user, limit);
     }
 
-    // ─────────────────────────────────────────────────────────────
+    /// Returns the current daily spending limit for the caller, or `None` if unset.
+    pub fn get_daily_limit(env: Env, user: Address) -> Option<i128> {
+        spending_limit::get_daily_limit(&env, &user)
+    }
+
+    /// Returns the amount spent so far today via `pay_per_use()` for the caller.
+    pub fn get_daily_spent(env: Env, user: Address) -> i128 {
+        spending_limit::get_daily_spent(&env, &user)
+    }
+
+    // ─────────────────────────────────────────────
     // Referral tracking
     // ─────────────────────────────────────────────────────────────
 

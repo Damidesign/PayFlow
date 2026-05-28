@@ -6,6 +6,8 @@ import SubscriptionCard from "./SubscriptionCard";
 import SubscriptionHistory from "./SubscriptionHistory";
 import PayPerUseForm from "./PayPerUseForm";
 import ConfirmModal from "./ConfirmModal";
+import DailyLimitCard from "./DailyLimitCard";
+import DailyLimitModal from "./DailyLimitModal";
 import IncreaseAllowanceModal from "./IncreaseAllowanceModal";
 import AllowanceDisplay from "./AllowanceDisplay";
 import ToastContainer from "./Toast";
@@ -27,8 +29,10 @@ export default function Dashboard({ userKey, onSign, refreshTrigger, announce }:
   const cancelTx = useTransaction();
   const ppuTx = useTransaction();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showDailyLimit, setShowDailyLimit] = useState(false);
   const [showIncreaseAllowance, setShowIncreaseAllowance] = useState(false);
   const [allowanceRefresh, setAllowanceRefresh] = useState(0);
+  const [dailyLimitRefresh, setDailyLimitRefresh] = useState(0);
 
   usePolling({ callback: refresh, interval: 30000, enabled: !!sub?.active });
 
@@ -101,6 +105,12 @@ export default function Dashboard({ userKey, onSign, refreshTrigger, announce }:
                     Increase Allowance
                   </button>
                 </div>
+              <DailyLimitCard
+                userKey={userKey}
+                refreshTrigger={dailyLimitRefresh}
+                onOpen={() => setShowDailyLimit(true)}
+              />
+
               </div>
 
               <SubscriptionHistory userKey={userKey} />
@@ -114,6 +124,19 @@ export default function Dashboard({ userKey, onSign, refreshTrigger, announce }:
       )}
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+      {showDailyLimit && sub?.active && (
+        <DailyLimitModal
+          userKey={userKey}
+          onSign={onSign}
+          onClose={() => setShowDailyLimit(false)}
+          onSuccess={() => {
+            setShowDailyLimit(false);
+            setDailyLimitRefresh((value) => value + 1);
+          }}
+          announce={announce}
+        />
+      )}
 
       {showConfirm && (
         <ConfirmModal

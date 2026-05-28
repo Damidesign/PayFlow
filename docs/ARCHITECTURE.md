@@ -66,6 +66,8 @@ There is no centralised backend. The only off-chain component required is a **ke
 | `get_active_count()` | No | None | Returns the running total of active subscriptions. |
 | `get_merchant_revenue(merchant)` | No | None | Returns cumulative revenue for a merchant address. |
 | `set_daily_limit(user, limit)` | Yes | `user` | Sets a daily spending cap for `pay_per_use()`. Stored in temporary storage. |
+| `get_daily_limit(user)` | No | None | Returns the current daily spending cap for `pay_per_use()` or `None` if unset. |
+| `get_daily_spent(user)` | No | None | Returns today's amount spent via `pay_per_use()`. |
 
 ### Why `charge()` has no auth
 
